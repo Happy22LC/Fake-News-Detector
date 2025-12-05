@@ -5,8 +5,8 @@ import os
 import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
+from xgboost import XGBClassifier
 
 
 # 1. LOAD COMBINED DATASET
@@ -16,7 +16,7 @@ print("Total samples:", len(df))
 
 
 
-# 2. CLEANING FUNCTION (same used in Flask!)
+# 2. CLEANING FUNCTION (same used in Flask)
 
 def clean_text(text):
     text = str(text).lower()
@@ -64,7 +64,8 @@ X_train, X_test, y_train, y_test = train_test_split(
 # 6. TF-IDF VECTORIZER (BEST CONFIG)
 
 vectorizer = TfidfVectorizer(
-    max_features=12000,
+    #max_features=15000,
+    max_features=30000,
     ngram_range=(1, 2),
     stop_words="english",
     min_df=2,        # removes rare noise
@@ -75,35 +76,27 @@ X_train_tfidf = vectorizer.fit_transform(X_train)
 X_test_tfidf = vectorizer.transform(X_test)
 
 
-
-# 7. LOGISTIC REGRESSION MODEL (BEST for TF-IDF)
-
-model = LogisticRegression(
-    max_iter=5000,
-    class_weight="balanced",    # prevents bias toward one label
+# 7. XGBOOST MODEL
+model = XGBClassifier(
+    n_estimators=800,
+    max_depth=8,
+    learning_rate=0.08,
+    subsample=0.9,
+    colsample_bytree=0.9,
+    eval_metric="logloss",
     n_jobs=-1
 )
 
 model.fit(X_train_tfidf, y_train)
 
-
 # 8. EVALUATION
-
 preds = model.predict(X_test_tfidf)
-
 print("\nAccuracy:", accuracy_score(y_test, preds))
 print("\nClassification Report:\n", classification_report(y_test, preds))
 
-
-
 # 9. SAVE MODEL + VECTORIZER
-
 os.makedirs("models", exist_ok=True)
-
-joblib.dump(model, "models/xgboost_model.pkl")   # keep filename same for Flask
+joblib.dump(model, "models/xgboost_model.pkl")
 joblib.dump(vectorizer, "models/vectorizer.pkl")
-
-print("\nModel saved successfully!")
-
-
+print("Model saved successfully!")
 
