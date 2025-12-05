@@ -2,8 +2,11 @@ from flask import Flask, render_template, request, jsonify
 import joblib
 import os
 import re
-
+from database import init_db, save_prediction, get_all_predictions
 app = Flask(__name__)
+
+# Initialize database on startup
+init_db()
 
 # Load model + vectorizer
 model = joblib.load("models/xgboost_model.pkl")
@@ -42,14 +45,25 @@ def predict():
 
     # Get probability
     proba = model.predict_proba(tfidf)[0]
-    prob = float(proba[pred])
+    prob = float(proba[pred])   #this is probability value
 
     label = "FAKE NEWS" if pred == 0 else "REAL NEWS"
+
+
+    # Save result into SQLite
+    save_prediction(text, label, prob * 100)
+
 
     return jsonify({
         "prediction": label,
         "confidence": round(prob * 100, 2)
     })
+
+
+@app.route("/logs")
+def logs_page():
+    logs = get_all_predictions()
+    return render_template("logs.html", logs=logs)
 
 if __name__ == "__main__":
     app.run(debug=True)
