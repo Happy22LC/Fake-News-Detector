@@ -1,5 +1,5 @@
 body {
-    background: #f4f4f9;
+    background: #e0dead;
     font-family: Arial, sans-serif;
     padding: 40px;
 }
@@ -23,7 +23,7 @@ textarea {
 
 button {
     padding: 12px 20px;
-    background: royalblue;
+    background: #108f18;
     color: white;
     border: none;
     cursor: pointer;

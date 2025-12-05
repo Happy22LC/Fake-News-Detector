@@ -20,6 +20,9 @@
         <p><strong>Prediction:</strong> <span id="prediction">-</span></p>
         <p><strong>Confidence:</strong> <span id="confidence">-</span></p>
     </div>
+    <a href="/logs" style="font-size:16px; margin-top:20px; display:block;">
+    View Saved Predictions
+    </a>
 </div>
 
 <!-- JAVASCRIPT -->
@@ -45,16 +48,12 @@ async function analyzeNews() {
         return;
     }
 
-    // BACKEND already returns correct label + % (e.g., 91.83)
+    // BACKEND already returns correct label and percentage
     document.getElementById("prediction").innerText = result.prediction;
     document.getElementById("confidence").innerText = result.confidence + "%";
 }
 
 </script>
-
-<a href="/logs" style="font-size:16px; margin-top:20px; display:block;">
-    🔍 View Saved Predictions
-</a>
 
 
 </body>

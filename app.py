@@ -1,14 +1,13 @@
 from flask import Flask, render_template, request, jsonify
 import joblib
-import os
 import re
 from database import init_db, save_prediction, get_all_predictions
 app = Flask(__name__)
 
-# Initialize database on startup
+# initialize database
 init_db()
 
-# Load model + vectorizer
+# Load model and vectorizer
 model = joblib.load("models/xgboost_model.pkl")
 vectorizer = joblib.load("models/vectorizer.pkl")
 
@@ -32,7 +31,7 @@ def predict():
     if not text or text.strip() == "":
         return jsonify({"error": "Text cannot be empty"}), 400
 
-    # CLEAN the input (IMPORTANT!)
+    # Clean the input text
     print("\nRAW TEXT:", text)
     cleaned = clean_text(text)
     print("CLEANED TEXT:", cleaned)
@@ -67,87 +66,3 @@ def logs_page():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-
-
-
-"""""
-from flask import Flask, render_template, request, jsonify
-from flask_cors import CORS
-import joblib
-import sqlite3
-import datetime
-import os
-
-app = Flask(__name__)
-CORS(app)
-
-# Load model + vectorizer
-model = joblib.load("models/xgboost_model.pkl")
-vectorizer = joblib.load("models/vectorizer.pkl")
-
-# Database init
-def init_db():
-    conn = sqlite3.connect("database.db")
-    cur = conn.cursor()
-    cur.execute("""
-        #CREATE TABLE IF NOT EXISTS logs (
-            #id INTEGER PRIMARY KEY AUTOINCREMENT,
-            #text TEXT,
-            #prediction TEXT,
-            #confidence REAL,
-            #timestamp TEXT
-        #)
-""")
-    conn.commit()
-    conn.close()
-
-init_db()
-
-print("MODEL LOADED SUCCESSFULLY")
-print("Model file timestamp:", os.path.getmtime("models/xgboost_model.pkl"))
-print(">>> Reached ROUTE section — Flask is loading routes now")
-
-# Home page
-@app.route("/")
-def home():
-    return render_template("index.html")
-
-# Predict
-@app.route('/predict', methods=['POST'])
-def predict():
-    text = request.form.get("news_text")
-
-    if not text or text.strip() == "":
-        return jsonify({"error": "Text cannot be empty"}), 400
-
-    tfidf = vectorizer.transform([text])
-
-    prediction = model.predict(tfidf)[0]
-    confidence = max(model.predict_proba(tfidf)[0])
-
-    # Convert to Python native types
-    prediction = int(prediction)
-    #prediction = "FAKE NEWS" if int(prediction) == 0 else "REAL NEWS"
-    confidence = float(round(confidence * 100, 2))
-
-    # Log to DB
-    conn = sqlite3.connect("database.db")
-    cur = conn.cursor()
-    cur.execute(
-        "INSERT INTO logs (text, prediction, confidence, timestamp) VALUES (?, ?, ?, ?)",
-        (text, prediction, confidence, str(datetime.datetime.now()))
-    )
-    conn.commit()
-    conn.close()
-
-    return jsonify({
-        "prediction": prediction,
-        "confidence": confidence
-    })
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
-"""""

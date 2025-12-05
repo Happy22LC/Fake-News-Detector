@@ -44,7 +44,7 @@ print("Balanced dataset size:", len(df))
 
 
 
-# 4. FIX LENGTH BIAS (critical!)
+# 4. FIX LENGTH BIAS
 
 df["length"] = df["text"].str.split().apply(len)
 
@@ -61,7 +61,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 
 
-# 6. TF-IDF VECTORIZER (BEST CONFIG)
+# 6. TF-IDF VECTORIZER
 
 vectorizer = TfidfVectorizer(
     #max_features=15000,
@@ -94,7 +94,7 @@ preds = model.predict(X_test_tfidf)
 print("\nAccuracy:", accuracy_score(y_test, preds))
 print("\nClassification Report:\n", classification_report(y_test, preds))
 
-# 9. SAVE MODEL + VECTORIZER
+# 9. SAVE MODEL AND VECTORIZER
 os.makedirs("models", exist_ok=True)
 joblib.dump(model, "models/xgboost_model.pkl")
 joblib.dump(vectorizer, "models/vectorizer.pkl")

@@ -3,9 +3,8 @@ from datetime import datetime
 
 DB_NAME = "database.db"
 
-# ------------------------------
-# Create database + table
-# ------------------------------
+# Create database and table
+
 def init_db():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
@@ -24,9 +23,9 @@ def init_db():
     conn.close()
 
 
-# ------------------------------
+
 # Save prediction into database
-# ------------------------------
+
 def save_prediction(text, label, confidence):
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
@@ -42,9 +41,9 @@ def save_prediction(text, label, confidence):
     conn.close()
 
 
-# ------------------------------
+
 # Fetch all saved predictions
-# ------------------------------
+
 def get_all_predictions():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
